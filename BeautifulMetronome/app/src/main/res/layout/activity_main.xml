@@ -6,72 +6,39 @@
     android:layout_height="match_parent"
     tools:context="com.tungnd.android.beautifulmetronome.MainActivity">
 
-   <TextView
-       android:id="@+id/visual"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:text="TEST"
-       android:background="#000"
-       android:textSize="100sp"
-       android:gravity="center"/>
+    <TextView
+        android:id="@+id/visual"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000"
+        android:gravity="center"
+        android:text="TEST"
+        android:textSize="100sp" />
+
     <TextView
         android:id="@+id/visual_left_text"
+        android:layout_margin="@dimen/activity_vertical_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="left"
         android:layout_alignBottom="@+id/visual"
+        android:gravity="center"
+        android:text="Tempo: 100"
         android:textColor="#fff"
-        android:textSize="100sp"
-        android:gravity="center"/>
+        android:textSize="30sp" />
+
     <TextView
         android:id="@+id/visual_right_text"
-        android:layout_width="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_height="wrap_content"
-        android:text="TEST"
-        android:background="#000"
-        android:textSize="100sp"
-        android:gravity="center"/>
-    <TableLayout
         android:layout_margin="@dimen/activity_vertical_margin"
-        android:layout_below="@+id/visual"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/visual"
+        android:layout_alignParentRight="true"
+        android:background="#000"
+        android:gravity="center"
+        android:textColor="#fff"
+        android:text="4/4"
+        android:textSize="30sp" />
 
-        <TableRow>
-            <TextView
-                android:id="@+id/tempo_text"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="Tempo" />
-            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                android:id="@+id/tempo_slider"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                app:dsb_max="300"
-                app:dsb_min="30"
-                app:dsb_value="100" />
-        </TableRow>
-
-        <TableRow>
-            <TextView
-                android:id="@+id/volumn_text"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="Volumn" />
-            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                android:id="@+id/volumn_slider"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                app:dsb_indicatorColor="@color/colorAccent"
-                app:dsb_max="100"
-                app:dsb_min="1"
-                app:dsb_value="50" />
-        </TableRow>
-    </TableLayout>
+   <include layout="@layout/settings_layout" />
 
 </RelativeLayout>
