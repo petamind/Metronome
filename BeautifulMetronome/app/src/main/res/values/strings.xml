@@ -1,3 +1,37 @@
 <resources>
-    <string name="app_name">Beautiful Metronome</string>
+    <string name="app_name">Total Focus Metronome</string>
+    <string-array name="tempo_name">
+        <item>Larghissimo</item>
+        <item>Grave</item>
+        <item>Largo</item>
+        <item>Lento</item>
+        <item>Larghetto</item>
+        <item>Adagio</item>
+        <item>Adagietto</item>
+        <item>Andante</item>
+        <item>Andantino</item>
+        <item>Andante moderato</item>
+        <item>Moderato</item>
+        <item>Allegro</item>
+        <item>Vivace</item>
+        <item>Presto</item>
+        <item>Prestissimo</item>
+    </string-array>
+    <integer-array name="tempo_vals">
+        <item>24</item>
+        <item>40</item>
+        <item>45</item>
+        <item>60</item>
+        <item>66</item>
+        <item>72</item>
+        <item>76</item>
+        <item>80</item>
+        <item>108</item>
+        <item>112</item>
+        <item>120</item>
+        <item>168</item>
+        <item>176</item>
+        <item>200</item>
+        <item>400</item>
+    </integer-array>
 </resources>
