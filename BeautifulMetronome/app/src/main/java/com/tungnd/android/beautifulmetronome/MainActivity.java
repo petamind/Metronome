@@ -1,8 +1,10 @@
 package com.tungnd.android.beautifulmetronome;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * Main activity to start app
@@ -11,6 +13,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TempoView tempoView;
     private boolean start;
+    private BeatPlayer beatPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         this.tempoView = (TempoView) findViewById(R.id.visual);
         tempoView.setOnClickListener(this);
+        this.beatPlayer = new BeatPlayer(this);
     }
 
     @Override
@@ -28,9 +32,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 start = !start;
                 if(start)
                 {
-                    tempoView.startBeat();
+                    Intent svc=new Intent(this, PlayerService.class);
+                    svc.setAction(PlayerService.ACTION_PLAY);
+                    startService(svc);
+                    Toast.makeText(this, "start svc", Toast.LENGTH_SHORT).show();
+//                    tempoView.startBeat();
+//                    this.beatPlayer.play();
                 } else {
-                    tempoView.stopBeat();
+//                    tempoView.stopBeat();
+//                    if(this.beatPlayer!=null){
+//                        beatPlayer.stop();
+//                    }
                 }
             }
         }

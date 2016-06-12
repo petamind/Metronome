@@ -6,5 +6,4 @@ package com.tungnd.android.beautifulmetronome;
 public interface metronome {
     void startBeat();
     void stopBeat();
-
 }
