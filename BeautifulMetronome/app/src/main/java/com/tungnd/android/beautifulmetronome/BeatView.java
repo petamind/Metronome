@@ -6,11 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
-
-import java.util.Random;
 
 /**
  * Created by tungs on 6/10/2016.
@@ -26,12 +25,37 @@ public class BeatView extends View implements metronome {
     private int y;
     private Paint paint;
     private long mAnimStartTime;
+    private boolean isBeating = false;
 
     private int[] beatSequence = TimeSignalPatern.t4_4.getBeatSequence();
     private int beatIndex = 0;
-    private Handler mHandler = new Handler();
-    private Runnable mTick;
-
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            invalidate();
+        }
+    };
+    private Runnable mTick = new Runnable() {
+        public void run() {
+            synchronized (beatLock) {
+                while (isBeating) {
+                    try {
+                        beatLock.wait();
+                        mHandler.sendEmptyMessage(0);
+                        Thread.sleep(mAnimStartTime / 4);
+                        mHandler.sendEmptyMessage(0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
+    ;
+    /**
+     * To synchronize the visual with sound
+     */
+    private Object beatLock;
 
     public BeatView(Context context) {
         super(context);
@@ -78,8 +102,13 @@ public class BeatView extends View implements metronome {
         this.mAnimStartTime = 60000 / tempo / 2;
     }
 
+    public void setBeatLock(Object beatLock) {
+        this.beatLock = beatLock;
+    }
+
     /**
      * Draw circles based on beat pattern (time signature)
+     *
      * @param canvas
      */
     @Override
@@ -88,10 +117,10 @@ public class BeatView extends View implements metronome {
 
         if (paint == null) {
             paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(getResources().getColor(R.color.colorAccent));
         }
-        paint.setColor(getResources().getColor(R.color.colorAccent));
 
-        System.out.println(x + ": " + y + ": " + beatIndex);
+        Log.d(this.toString(), x + ": " + y + ": " + beatIndex);
 
         switch (beatSequence[beatIndex]) {
             case 2:
@@ -109,23 +138,16 @@ public class BeatView extends View implements metronome {
 
     @Override
     public void startBeat() {
-        if (mTick == null) {
-            mTick = new Runnable() {
-                public void run() {
-                    invalidate();
-                    mHandler.postDelayed(this, mAnimStartTime);
-                }
-            };
-        }
-        Toast.makeText(getContext(), "start beat", Toast.LENGTH_SHORT).show();
-        mHandler.removeCallbacks(mTick);
-        mHandler.postDelayed(mTick, mAnimStartTime);
+        setBeating(true);
+        new Thread(mTick).start();
+    }
+
+    private void setBeating(boolean beating) {
+        this.isBeating = beating;
     }
 
     @Override
     public void stopBeat() {
-        mHandler.removeCallbacks(mTick);
-        mTick = null;
-        Toast.makeText(getContext(), "Stop beat", Toast.LENGTH_SHORT).show();
+        setBeating(false);
     }
 }
