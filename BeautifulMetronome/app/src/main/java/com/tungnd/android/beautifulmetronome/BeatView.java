@@ -16,7 +16,7 @@ import java.util.Random;
  * Created by tungs on 6/10/2016.
  * Visualize beats with simple circles
  */
-public class TempoView extends View implements metronome {
+public class BeatView extends View implements metronome {
     private int tempo = 60;
     /**
      * cirle diameter
@@ -26,37 +26,27 @@ public class TempoView extends View implements metronome {
     private int y;
     private Paint paint;
     private long mAnimStartTime;
-    /**
-     * Time signature
-     *
-     * 2 for main beat
-     * <p/>
-     * 1 for sub-beats
-     * <p/>
-     * 0 for nothing
-     */
-    private int[] beatSequence = {2, 0,1,0, 1,0, 1, 0};
+
+    private int[] beatSequence = TimeSignalPatern.t4_4.getBeatSequence();
     private int beatIndex = 0;
-
-
     private Handler mHandler = new Handler();
     private Runnable mTick;
 
 
-    public TempoView(Context context) {
+    public BeatView(Context context) {
         super(context);
     }
 
-    public TempoView(Context context, AttributeSet attrs) {
+    public BeatView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public TempoView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BeatView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public TempoView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public BeatView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
@@ -88,6 +78,10 @@ public class TempoView extends View implements metronome {
         this.mAnimStartTime = 60000 / tempo / 2;
     }
 
+    /**
+     * Draw circles based on beat pattern (time signature)
+     * @param canvas
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -95,7 +89,7 @@ public class TempoView extends View implements metronome {
         if (paint == null) {
             paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         }
-        paint.setColor(new Random(255).nextInt());
+        paint.setColor(getResources().getColor(R.color.colorAccent));
 
         System.out.println(x + ": " + y + ": " + beatIndex);
 

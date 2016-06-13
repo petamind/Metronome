@@ -5,11 +5,11 @@
     android:layout_height="match_parent"
     tools:context="com.tungnd.android.beautifulmetronome.MainActivity">
 
-    <com.tungnd.android.beautifulmetronome.TempoView
+    <com.tungnd.android.beautifulmetronome.BeatView
         android:id="@+id/visual"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="#aaa"
+        android:background="@color/colorPrimary"
         android:gravity="center"
         android:textSize="100sp" />
 

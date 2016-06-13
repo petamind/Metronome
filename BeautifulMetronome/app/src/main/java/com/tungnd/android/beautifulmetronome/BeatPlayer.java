@@ -11,6 +11,9 @@ import android.media.SoundPool;
  * <link>http://www.101apps.co.za/index.php/articles/using-android-s-soundpool-class-a-tutorial.html</link>
  *
  * http://stackoverflow.com/questions/17069955/play-sound-using-soundpool-example
+ * I prefer the background service so this class is replaced by PlayerService
+ *
+ * @deprecated
  */
 public class BeatPlayer implements Runnable{
     private SoundPool mSoundPool;
