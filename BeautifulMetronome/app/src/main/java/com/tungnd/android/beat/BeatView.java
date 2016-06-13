@@ -1,4 +1,4 @@
-package com.tungnd.android.beautifulmetronome;
+package com.tungnd.android.beat;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import com.tungnd.android.metronome.R;
 
 /**
  * Created by tungs on 6/10/2016.

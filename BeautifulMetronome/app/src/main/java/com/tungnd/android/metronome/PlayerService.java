@@ -1,4 +1,4 @@
-package com.tungnd.android.beautifulmetronome;
+package com.tungnd.android.metronome;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,12 +7,12 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.util.Objects;
+import com.tungnd.android.beat.metronome;
+
 import java.util.Timer;
 import java.util.TimerTask;
 

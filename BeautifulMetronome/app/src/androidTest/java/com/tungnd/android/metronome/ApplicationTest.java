@@ -1,4 +1,4 @@
-package com.tungnd.android.beautifulmetronome;
+package com.tungnd.android.metronome;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

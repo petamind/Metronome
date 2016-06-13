@@ -1,4 +1,4 @@
-package com.tungnd.android.beautifulmetronome;
+package com.tungnd.android.beat;
 
 /**
  * Created by tunguyen on 13/06/2016.

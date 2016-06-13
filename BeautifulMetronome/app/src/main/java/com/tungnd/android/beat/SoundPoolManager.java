@@ -1,4 +1,4 @@
-package com.tungnd.android.beautifulmetronome;
+package com.tungnd.android.beat;
 
 import android.app.Activity;
 import android.media.AudioManager;

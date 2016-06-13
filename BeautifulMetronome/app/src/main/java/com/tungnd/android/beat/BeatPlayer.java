@@ -1,9 +1,11 @@
-package com.tungnd.android.beautifulmetronome;
+package com.tungnd.android.beat;
 
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
+
+import com.tungnd.android.metronome.R;
 
 /**
  * Created by tungs on 6/11/2016.

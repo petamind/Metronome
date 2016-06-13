@@ -1,4 +1,4 @@
-package com.tungnd.android.beautifulmetronome;
+package com.tungnd.android.metronome;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,7 +10,12 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.GridView;
 import android.widget.Toast;
+
+import com.tungnd.android.beat.BeatView;
+import com.tungnd.android.beat.ButtonAdapter;
+import com.tungnd.android.beat.metronome;
 
 /**
  * Main activity to start app
@@ -31,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.beatView = (BeatView) findViewById(R.id.visual);
         beatView.setOnClickListener(this);
 
+        //Grid view
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        gridview.setAdapter(new ButtonAdapter(this));
     }
 
     @Override
