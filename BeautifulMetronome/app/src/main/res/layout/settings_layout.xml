@@ -1,89 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_below="@+id/visual"
-    android:layout_margin="@dimen/activity_vertical_margin">
+    android:layout_margin="@dimen/activity_vertical_margin"
+    android:orientation="vertical">
 
-    <TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/tempo_text"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="Tempo slider" />
+            android:src="@drawable/ic_action_music_note" />
 
         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
             android:id="@+id/tempo_slider"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="1"
+            app:dsb_indicatorColor="@android:color/holo_green_light"
+            app:dsb_indicatorTextAppearance="@style/MyDefaultTextAppearance"
             app:dsb_max="300"
-            app:dsb_min="30"
-            app:dsb_value="100" />
+            app:dsb_min="20"
+            app:dsb_value="60" />
     </TableRow>
 
-    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
+    <include layout="@layout/table"/>
+    <!--<GridView-->
+        <!--android:id="@+id/gridview"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:gravity="center"-->
+        <!--android:horizontalSpacing="1dp"-->
+        <!--android:numColumns="6"-->
+        <!--android:layout_weight="3"-->
+        <!--android:nestedScrollingEnabled="true"-->
+        <!--android:stretchMode="columnWidth"-->
+        <!--android:theme="@style/MyButton"-->
+        <!--android:verticalSpacing="1dp" />-->
 
-        <!--<TextView-->
-        <!--android:id="@+id/quick_text"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:text="Quick tempo" />-->
+    <Button
+        android:id="@+id/tap_tempo_text"
+        style="@style/MyDefaultTextAppearance"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:text="Tap to set tempo here" />
 
-        <GridView
-            android:theme="@style/MyButton"
-            android:id="@+id/gridview"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_span="2"
-            android:horizontalSpacing="1dp"
-            android:numColumns="6"
-            android:stretchMode="columnWidth"
-            android:verticalSpacing="1dp">
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        </GridView>
-    </TableRow>
-
-    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
-
-        <TextView
-            android:id="@+id/tap_text"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="Tap tempo" />
-
-        <TextView
-            android:id="@+id/tap_tempo_text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:text="Tap to set tempo here" />
-
-    </TableRow>
-
-    <TableRow android:layout_marginTop="@dimen/activity_vertical_margin">
-
-        <TextView
-            android:id="@+id/volumn_text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="Volumn" />
+            android:src="@drawable/ic_action_volume" />
 
         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
             android:id="@+id/volumn_slider"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:layout_gravity="center"
-            app:dsb_indicatorColor="@color/colorAccent"
+
+            app:dsb_indicatorColor="@android:color/holo_green_light"
+            app:dsb_indicatorTextAppearance="@style/MyDefaultTextAppearance"
             app:dsb_max="100"
             app:dsb_min="1"
             app:dsb_value="50" />
     </TableRow>
-</TableLayout>
+
+</LinearLayout>

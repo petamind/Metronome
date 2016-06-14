@@ -16,6 +16,7 @@ import com.tungnd.android.metronome.R;
  * 20/30/45/60/
  * 75/90/100/120
  * 150/170/200/240
+ * @deprecated as the gridview does not work well in CoordinatorLayout
  */
 public class ButtonAdapter extends BaseAdapter {
     private final Context context;

@@ -7,10 +7,17 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.Toast;
 
 import com.tungnd.android.beat.BeatView;
@@ -32,13 +39,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_metronome_paralax);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
         this.beatView = (BeatView) findViewById(R.id.visual);
         beatView.setOnClickListener(this);
 
-        //Grid view
-        GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ButtonAdapter(this));
+        //Table view
+        setupTableLayout();
+
+//        GridView gridview = (GridView) findViewById(R.id.gridview);
+//        gridview.setAdapter(new ButtonAdapter(this));
+    }
+
+    private void setupTableLayout() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TableLayout tableLayout = (TableLayout) findViewById(R.id.table);
+                LayoutInflater layoutInflater = getLayoutInflater();
+                for(int i = 0; i < 3; i++)
+                {
+                    TableRow r = (TableRow) layoutInflater.inflate(R.layout.table_row, null);
+                    for(int j = 0; j < 4; j++)
+                    {
+                        Button b = (Button) layoutInflater.inflate(R.layout.button, null);
+                        b.setOnClickListener(MainActivity.this);
+                        b.setText(""+metronome.tempos[i*4+j]);
+                        r.addView(b);
+                    }
+                    tableLayout.addView(r);
+                }
+            }
+        });
+
     }
 
     @Override
