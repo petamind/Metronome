@@ -19,18 +19,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".PlayerService" />
+        <service android:name=".PlayerService" android:enabled="true"/>
 
-        <activity
-            android:name=".MetronomeParalaxActivity"
-            android:label="@string/title_activity_metronome_paralax"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

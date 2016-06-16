@@ -7,7 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,13 +16,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tungnd.android.beat.BeatView;
-import com.tungnd.android.beat.ButtonAdapter;
 import com.tungnd.android.beat.metronome;
 
 /**
@@ -36,13 +35,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerService.LocalBinder localBinder;
     private Intent svc;
     private boolean doubleBackToExitPressedOnce;
-    private CollapsingToolbarLayout toolbar_layout;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metronome_paralax);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        setTitle("badfa");
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         this.beatView = (BeatView) findViewById(R.id.visual);
         beatView.setOnClickListener(this);
+
+        //this.appbar = (AppBarLayout) findViewById(R.id.app_bar);
 
         //Table view
         setupTableLayout();
@@ -69,14 +74,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 TableLayout tableLayout = (TableLayout) findViewById(R.id.table);
                 LayoutInflater layoutInflater = getLayoutInflater();
-                for(int i = 0; i < 3; i++)
-                {
+                for (int i = 0; i < 3; i++) {
                     TableRow r = (TableRow) layoutInflater.inflate(R.layout.table_row, null);
-                    for(int j = 0; j < 4; j++)
-                    {
+                    for (int j = 0; j < 4; j++) {
                         Button b = (Button) layoutInflater.inflate(R.layout.button, null);
                         b.setOnClickListener(MainActivity.this);
-                        b.setText(""+metronome.tempos[i*4+j]);
+                        b.setText("" + metronome.tempos[i * 4 + j]);
                         r.addView(b);
                     }
                     tableLayout.addView(r);
@@ -118,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }
@@ -186,4 +189,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mBound = false;
         }
     };
+
+    /**
+     * control when appbar colapsed/open
+     * <p/>
+     * In this app, i want to hide the Title of text by changing its alpha.
+     *
+     * @param appBarLayout
+     * @param verticalOffset
+     */
+//    @Override
+//    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+//        Log.d("offset", verticalOffset + "");
+//        if (verticalOffset == 0) {
+//            // Collapsed
+//            setTitle("Collaped");
+//        } else {
+//            // Not collapsed
+//
+//        }
+//    }
 }

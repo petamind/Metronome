@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.tungnd.android.metronome.MetronomeParalaxActivity"
+    tools:context="com.tungnd.android.metronome.MainActivity"
     tools:showIn="@layout/activity_metronome_paralax">
 
    <include layout="@layout/settings_layout"/>
