@@ -7,7 +7,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,16 +17,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tungnd.android.beat.BeatView;
 import com.tungnd.android.beat.metronome;
 
+import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
+
 /**
  * Main activity to start app
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, metronome {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, metronome, DiscreteSeekBar.OnProgressChangeListener {
 
     private BeatView beatView;
     private boolean start;
@@ -35,18 +35,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerService.LocalBinder localBinder;
     private Intent svc;
     private boolean doubleBackToExitPressedOnce;
-    private Toolbar toolbar;
+    private DiscreteSeekBar tempoSeekBar;
+    private DiscreteSeekBar volumeSeekBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metronome_paralax);
 
-         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setTitle("badfa");
-        setSupportActionBar(toolbar);
+        tempoSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
+        tempoSeekBar.setOnProgressChangeListener(this);
+        volumeSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
+        volumeSeekBar.setOnProgressChangeListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -190,23 +194,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    /**
-     * control when appbar colapsed/open
-     * <p/>
-     * In this app, i want to hide the Title of text by changing its alpha.
-     *
-     * @param appBarLayout
-     * @param verticalOffset
-     */
-//    @Override
-//    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-//        Log.d("offset", verticalOffset + "");
-//        if (verticalOffset == 0) {
-//            // Collapsed
-//            setTitle("Collaped");
-//        } else {
-//            // Not collapsed
-//
-//        }
-//    }
+
+    @Override
+    public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+        switch (seekBar.getId()){
+            case R.id.volumn_slider:
+                //change tempo
+                break;
+            case R.id.tempo_slider:
+                //change volume
+                break;
+        }
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
+    }
 }
