@@ -7,7 +7,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,19 +15,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
 import com.tungnd.android.beat.BeatView;
-import com.tungnd.android.beat.ButtonAdapter;
 import com.tungnd.android.beat.metronome;
+
+import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 /**
  * Main activity to start app
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, metronome {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, metronome, DiscreteSeekBar.OnProgressChangeListener {
 
     private BeatView beatView;
     private boolean start;
@@ -36,14 +35,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PlayerService.LocalBinder localBinder;
     private Intent svc;
     private boolean doubleBackToExitPressedOnce;
-    private CollapsingToolbarLayout toolbar_layout;
+    private DiscreteSeekBar tempoSeekBar;
+    private DiscreteSeekBar volumeSeekBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metronome_paralax);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        tempoSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
+        tempoSeekBar.setOnProgressChangeListener(this);
+        volumeSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
+        volumeSeekBar.setOnProgressChangeListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         this.beatView = (BeatView) findViewById(R.id.visual);
         beatView.setOnClickListener(this);
+
+        //this.appbar = (AppBarLayout) findViewById(R.id.app_bar);
 
         //Table view
         setupTableLayout();
@@ -69,14 +78,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 TableLayout tableLayout = (TableLayout) findViewById(R.id.table);
                 LayoutInflater layoutInflater = getLayoutInflater();
-                for(int i = 0; i < 3; i++)
-                {
+                for (int i = 0; i < 3; i++) {
                     TableRow r = (TableRow) layoutInflater.inflate(R.layout.table_row, null);
-                    for(int j = 0; j < 4; j++)
-                    {
+                    for (int j = 0; j < 4; j++) {
                         Button b = (Button) layoutInflater.inflate(R.layout.button, null);
                         b.setOnClickListener(MainActivity.this);
-                        b.setText(""+metronome.tempos[i*4+j]);
+                        b.setText("" + metronome.tempos[i * 4 + j]);
                         r.addView(b);
                     }
                     tableLayout.addView(r);
@@ -118,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }
@@ -186,4 +193,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mBound = false;
         }
     };
+
+
+    @Override
+    public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+        switch (seekBar.getId()){
+            case R.id.volumn_slider:
+                //change tempo
+                break;
+            case R.id.tempo_slider:
+                //change volume
+                break;
+        }
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+
+    }
 }
