@@ -23,9 +23,13 @@ public class BeatView extends View implements metronome {
      * cirle diameter
      */
     private int diameter;
+    private int max_height;
     private int x;
     private int y;
     private Paint paint;
+    /**
+     * it is the beat interval
+     */
     private long mAnimStartTime;
     private boolean isBeating = false;
 
@@ -81,6 +85,9 @@ public class BeatView extends View implements metronome {
         this.x = getWidth() / 2;
         this.y = getHeight() / 2;
         this.setDiameter(Math.min(x, y) / 2);
+        if (max_height < getHeight()) {
+            max_height = getHeight();
+        }
         setTempo(tempo);
     }
 
@@ -122,17 +129,18 @@ public class BeatView extends View implements metronome {
             paint.setColor(getResources().getColor(R.color.colorAccent));
         }
 
-        Log.d(this.toString(), x + ": " + y + ": " + beatIndex);
-
-        switch (beatSequence[beatIndex]) {
-            case 2:
-                canvas.drawCircle(x, y, diameter, paint);
-                break;
-            case 1:
-                canvas.drawCircle(x, y, diameter / 2, paint);
-                break;
-            default:
-                canvas.drawCircle(x, y, 0, paint);
+        //Log.d(this.toString(), x + ": " + y + ": " + beatIndex);
+        if (x > max_height / 3) {
+            switch (beatSequence[beatIndex]) {
+                case 2:
+                    canvas.drawCircle(x, y, diameter, paint);
+                    break;
+                case 1:
+                    canvas.drawCircle(x, y, diameter / 2, paint);
+                    break;
+                default:
+                    canvas.drawCircle(x, y, 0, paint);
+            }
         }
 
         beatIndex = ++beatIndex % beatSequence.length;

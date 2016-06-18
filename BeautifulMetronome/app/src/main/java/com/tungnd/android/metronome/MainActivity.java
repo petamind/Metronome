@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BeatView beatView;
     private boolean start;
     private static PlayerService playerService;
-    private PlayerService.LocalBinder localBinder;
     private Intent svc;
     private boolean doubleBackToExitPressedOnce;
     private DiscreteSeekBar tempoSeekBar;
@@ -49,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         tempoSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
         tempoSeekBar.setOnProgressChangeListener(this);
-        volumeSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
+
+        volumeSeekBar = (DiscreteSeekBar) findViewById(R.id.volumn_slider);
         volumeSeekBar.setOnProgressChangeListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -63,15 +63,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.beatView = (BeatView) findViewById(R.id.visual);
         beatView.setOnClickListener(this);
 
-        //this.appbar = (AppBarLayout) findViewById(R.id.app_bar);
-
-        //Table view
         setupTableLayout();
 
-//        GridView gridview = (GridView) findViewById(R.id.gridview);
-//        gridview.setAdapter(new ButtonAdapter(this));
     }
 
+
+    /**
+     * Create table of tempos
+     */
     private void setupTableLayout() {
         runOnUiThread(new Runnable() {
             @Override
@@ -199,10 +198,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
         switch (seekBar.getId()){
             case R.id.volumn_slider:
-                //change tempo
+                //change volume
                 break;
             case R.id.tempo_slider:
-                //change volume
+                playerService.setTempo(tempoSeekBar.getProgress());
+                //change tempo
                 break;
         }
 
@@ -210,11 +210,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
+        switch (seekBar.getId()){
+           case R.id.tempo_slider:
+                playerService.stopBeat();
+                //change tempo
+                break;
+        }
     }
 
     @Override
     public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
+        switch (seekBar.getId()){
+            case R.id.tempo_slider:
+                //playerService.startBeat();
+                //change tempo
+                break;
+        }
     }
 }

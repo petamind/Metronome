@@ -25,7 +25,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             app:dsb_indicatorColor="@android:color/holo_green_light"
-            app:dsb_indicatorTextAppearance="@style/MyDefaultTextAppearance"
+            app:dsb_indicatorTextAppearance="@style/MySliderTextAppearance"
             app:dsb_max="300"
             app:dsb_min="20"
             app:dsb_value="60" />
@@ -68,11 +68,10 @@
             android:id="@+id/volumn_slider"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:layout_gravity="center"
-
+            android:layout_weight="1"
             app:dsb_indicatorColor="@android:color/holo_green_light"
-            app:dsb_indicatorTextAppearance="@style/MyDefaultTextAppearance"
+            app:dsb_indicatorTextAppearance="@style/MySliderTextAppearance"
             app:dsb_max="100"
             app:dsb_min="1"
             app:dsb_value="50" />
