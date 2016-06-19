@@ -82,8 +82,7 @@
             app:dsb_indicatorColor="@android:color/holo_green_light"
             app:dsb_indicatorTextAppearance="@style/MySliderTextAppearance"
             app:dsb_max="100"
-            app:dsb_min="1"
-            app:dsb_value="50" />
+            app:dsb_min="0" />
     </TableRow>
 
 </LinearLayout>

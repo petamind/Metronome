@@ -105,8 +105,8 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
         //soundPool = ... // initialize it here
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             AudioAttributes attributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_GAME)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
                     .build();
             for (int i = 0; i < mSoundPools.length; i++) {

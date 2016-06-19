@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -12,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -25,17 +27,18 @@ import com.tungnd.android.beat.metronome;
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 /**
- * Main activity to start app
+ * Main activity to isPlaying app
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, metronome, DiscreteSeekBar.OnProgressChangeListener {
 
     private static PlayerService playerService;
     private BeatView beatView;
-    private boolean start;
+    private boolean isPlaying;
     private Intent svc;
     private boolean doubleBackToExitPressedOnce;
     private DiscreteSeekBar tempoSeekBar;
     private DiscreteSeekBar volumeSeekBar;
+    private int maxVolumeMusicStream;
     private boolean mBound;
     /**
      * Defines callbacks for service binding, passed to bindService()
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
             playerService = binder.getService();
             mBound = true;
+            setVolume(0);//sync current volume
         }
 
         @Override
@@ -58,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mBound = false;
         }
     };
+    private AudioManager audioManager;
+    private int curVolume;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +77,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button changeSoundButton = (Button) findViewById(R.id.change_sound_btn);
         changeSoundButton.setOnClickListener(this);
 
+        //init tempo
         tempoSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
         tempoSeekBar.setOnProgressChangeListener(this);
 
-        volumeSeekBar = (DiscreteSeekBar) findViewById(R.id.volumn_slider);
-        volumeSeekBar.setOnProgressChangeListener(this);
 
+        //init float button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +95,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         beatView.setOnClickListener(this);
 
         setupTableLayout();
+
+        //init volume control
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        volumeSeekBar = (DiscreteSeekBar) findViewById(R.id.volumn_slider);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        maxVolumeMusicStream = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        volumeSeekBar.setOnProgressChangeListener(this);
 
     }
 
@@ -145,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPause() {
         super.onPause();
         if (mBound) {
-            Log.d("onPause", "unbind the service connection "+ mConnection);
+            Log.d("onPause", "unbind the service connection " + mConnection);
             unbindService(mConnection);
             mBound = false;
         }
@@ -171,13 +185,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                setVolume(0);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                setVolume(0);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         stopBeat();
     }
 
     /**
-     * In general, click on the Beat View will start the beat
+     * In general, click on the Beat View will isPlaying the beat
      *
      * @param v
      */
@@ -185,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.visual: {
-                start = !start;
+                isPlaying = !isPlaying;
                 startBeat();
                 break;
             }
@@ -200,9 +232,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void startBeat() {
-        if (start) {
-            playerService.startBeat();
+        if (isPlaying) {
             beatView.setBeatLock(playerService);//sync with sound
+            playerService.startBeat();
             beatView.startBeat();
         } else {
             stopBeat();
@@ -224,7 +256,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void setVolume(float volume) {
-
+        curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        volumeSeekBar.setProgress(100 * curVolume / maxVolumeMusicStream );
     }
 
     @Override
@@ -232,6 +265,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (seekBar.getId()) {
             case R.id.volumn_slider:
                 //change volume
+                if (fromUser) {
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volumeSeekBar.getProgress() * maxVolumeMusicStream / 100, 0);
+                }
+                playerService.setVolume(((float) volumeSeekBar.getProgress()) / 100);
                 break;
             case R.id.tempo_slider:
                 playerService.setTempo(tempoSeekBar.getProgress());

@@ -29,11 +29,13 @@ public class BeatView extends View implements metronome {
     /**
      * it is the beat interval
      */
-    private long mAnimStartTime;
-    private boolean isBeating = false;
-
+    private long mBeatDuration;
+    private boolean isPlaying = false;
+    /**
+     * This sequence is used to stimulate the time signature
+     */
     private int[] beatSequence = TimeSignalPatern.t4_4.getBeatSequence();
-    private int beatIndex = 0;
+    private int beatDrawIndex = 0;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -44,15 +46,15 @@ public class BeatView extends View implements metronome {
      * To synchronize the visual with sound
      */
     private Object beatLock;
-    ;
+
     private Runnable mTick = new Runnable() {
         public void run() {
             synchronized (beatLock) {
-                while (isBeating) {
+                while (isPlaying) {
                     try {
                         beatLock.wait();
                         mHandler.sendEmptyMessage(0);
-                        Thread.sleep(mAnimStartTime / 4);
+                        Thread.sleep(mBeatDuration / 4);
                         mHandler.sendEmptyMessage(0);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -80,7 +82,7 @@ public class BeatView extends View implements metronome {
     }
 
     private void init() {
-        this.beatIndex = 0;
+        this.beatDrawIndex = 0;
         this.x = getWidth() / 2;
         this.y = getHeight() / 2;
         this.setDiameter(Math.min(x, y) / 2);
@@ -107,7 +109,7 @@ public class BeatView extends View implements metronome {
      */
     public void setTempo(int tempo) {
         this.tempo = tempo;
-        this.mAnimStartTime = 60000 / tempo / 2;
+        this.mBeatDuration = 60000 / tempo / 2;
     }
 
     public void setBeatLock(Object beatLock) {
@@ -128,9 +130,9 @@ public class BeatView extends View implements metronome {
             paint.setColor(getResources().getColor(R.color.colorAccent));
         }
 
-        //Log.d(this.toString(), x + ": " + y + ": " + beatIndex);
+        //Log.d(this.toString(), x + ": " + y + ": " + beatDrawIndex);
         if (x > max_height / 3) {
-            switch (beatSequence[beatIndex]) {
+            switch (beatSequence[beatDrawIndex]) {
                 case 2:
                     canvas.drawCircle(x, y, diameter, paint);
                     break;
@@ -142,26 +144,31 @@ public class BeatView extends View implements metronome {
             }
         }
 
-        beatIndex = ++beatIndex % beatSequence.length;
+        beatDrawIndex = ++beatDrawIndex % beatSequence.length;
     }
 
     @Override
     public void startBeat() {
-        setBeating(true);
+        setPlaying(true);
         new Thread(mTick).start();
     }
 
-    private void setBeating(boolean beating) {
-        this.isBeating = beating;
+    private void setPlaying(boolean playing) {
+        this.isPlaying = playing;
     }
 
     @Override
     public void stopBeat() {
-        setBeating(false);
+        setPlaying(false);
     }
 
     @Override
     public void changeSound() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setVolume(float volume) {
         throw new UnsupportedOperationException();
     }
 }
