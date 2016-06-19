@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Binder;
 import android.os.IBinder;
@@ -19,19 +18,35 @@ import java.util.TimerTask;
 
 /**
  * Created by tungs on 6/10/2016.
- * As described by stackoverflow, it is not good with Media player and thread for metronome but it is a good to try with background and soundpool
+ * As described by stackoverflow, it is not good with Media player and thread for metronome
+ * but it is a good to try with background and soundpool
  * http://stackoverflow.com/questions/21043059/play-background-sound-in-android-applications
  * <p/>
  * http://stackoverflow.com/questions/5580537/androidsound-pool-and-service
+ *
+ * improve sound pool performance
+ * http://www.thiagorosa.com.br/en/how-to/improve-soundpool-performance
+ * The lagging is solved by adding dummy soulpool to play muted sound. It does help the beat play in the accurate frequency.
  */
 public class PlayerService extends Service implements SoundPool.OnLoadCompleteListener, metronome {
-    private final int NUMBER_OF_SOUNDPOOLS = 1;
+    /**
+     * One for play and one for play dummy muted sound
+     */
+    private final int NUMBER_OF_SOUNDPOOLS = 2;
+    /**
+     * Contain one main player and one dummy player
+     */
     private SoundPool[] mSoundPools = new SoundPool[NUMBER_OF_SOUNDPOOLS];
-    private int soundPoolIndex;
-    private AudioAttributes attributes;
-    private int soundId;
+    /**
+     * List of metronome sound IDs: currently supports 8 sounds
+     */
+    private int[] streamIds = new int[8];
+    /**
+     * Control the play/stop states
+     */
     private boolean enabled = false;
     private boolean isResourceReady = false;
+    private float volume = 1.0f;
     private Timer timer;
     private IBinder mIBinder = new LocalBinder();
     /**
@@ -42,50 +57,39 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
      * time in miliseconds between 2 beats
      */
     private long beatInterval;
+    /**
+     * select sound
+     */
+    private int soundIndex;
 
     @Override
     public void startBeat() {
         setEnabled(true);
+        //Start the dummy muted sound so that it can remove the lagging issue
+        //but the issue is only noticeable in under 170 BPM
+        if(this.tempo < 170)
+        {
+            mSoundPools[1].play(streamIds[0], 0, 0, 0,-1, 1f);
+        }
     }
 
     @Override
     public void stopBeat() {
         setEnabled(false);
+        //stop dummy sound when stop
+        mSoundPools[1].stop(streamIds[0]);
     }
 
-    /**
-     * Class used for the client Binder.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with IPC.
-     */
-    public class LocalBinder extends Binder {
-        PlayerService getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return PlayerService.this;
-        }
+    @Override
+    public void changeSound() {
+        soundIndex = ++soundIndex % streamIds.length;
+        Log.d(this.toString(), "Sound index: " + soundIndex);
     }
 
-    private final class BeatTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            if (enabled && isResourceReady) {
-                //Toast.makeText(PlayerService.this, "Play now ", Toast.LENGTH_SHORT).show();
-                // synchronized (PlayerService.this) {
-
-                soundPoolIndex = ++soundPoolIndex % mSoundPools.length;
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSoundPools[soundPoolIndex].play(soundId, 1, 1, 0, 0, 1.0f);
-                    }
-                }
-                ).start();
-//                    PlayerService.this.notify();
-                //}
-            }
-        }
+    @Override
+    public void setVolume(float volume) {
+        this.volume = volume;
     }
-
 
     @Nullable
     @Override
@@ -100,42 +104,48 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
 
         //soundPool = ... // initialize it here
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            attributes = new AudioAttributes.Builder()
+            AudioAttributes attributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_GAME)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
                     .build();
             for (int i = 0; i < mSoundPools.length; i++) {
                 this.mSoundPools[i] = new SoundPool.Builder()
                         .setAudioAttributes(attributes)
-                        .setMaxStreams(5)
+                        .setMaxStreams(3)
                         .build();
             }
         } else {
             for (int i = 0; i < mSoundPools.length; i++) {
-                this.mSoundPools[i] = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+                this.mSoundPools[i] = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
             }
 
         }
 
         mSoundPools[0].setOnLoadCompleteListener(this);//set listener
 
-//        mSoundPools[1].load(this, R.raw.snd0, 1);
-//        mSoundPools[2].load(this, R.raw.snd0, 1);
-        soundId = mSoundPools[0].load(this, R.raw.snd0, 1); // in 2nd param u have to pass your desire tone
+        int soundId;
+        for (int i = 0; i < streamIds.length; i++) {
+            soundId = getResources().getIdentifier("snd" + i, "raw", getApplicationContext().getPackageName());
+            for (SoundPool sp : mSoundPools) {
+                streamIds[i] = sp.load(this, soundId, 1); // in 2nd param u have to pass your desire tone
+            }
+        }
+
     }
 
     public void onDestroy() {
         Log.d(this.toString(), "On destroy");
         if (mSoundPools != null) {
+            timer.cancel();
             setEnabled(false);
             for (SoundPool sp : mSoundPools) {
                 sp.release();
             }
-            timer.cancel();
         }
     }
 
-    public void setEnabled(boolean start) {
+    private void setEnabled(boolean start) {
         this.enabled = start;
     }
 
@@ -152,10 +162,6 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
         }
     }
 
-    public int getTempo() {
-        return tempo;
-    }
-
     private void setBeatInterval(long beatInterval) {
         this.beatInterval = beatInterval;
         setTimer();
@@ -168,7 +174,7 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
         if (timer != null) {
             timer.cancel();
         }
-        timer = new Timer();
+        timer = new Timer("Metronome", true);
         timer.scheduleAtFixedRate(new BeatTimerTask(), 0L, beatInterval);
     }
 
@@ -187,6 +193,38 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
             setTempo(60);
         } else {
             Toast.makeText(this, "Error loading media files", Toast.LENGTH_SHORT).show();
+            isResourceReady = false;
+        }
+    }
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class LocalBinder extends Binder {
+        PlayerService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return PlayerService.this;
+        }
+    }
+
+    /**
+     * inner class TimerTask that plays the sound
+     */
+    private final class BeatTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            if (enabled && isResourceReady) {
+
+                synchronized (PlayerService.this) {
+                    //the first soundpool will be used to play the beat with highest priority
+                    //but it does not help much for the lagging issue of soundpool
+                    //so it is good to use a dummy muted sound by the other soundpool
+                    mSoundPools[0].play(streamIds[soundIndex], volume, volume, 10, 0, 1.0f);
+
+                    PlayerService.this.notify();//notify to draw the time signature on each beat
+                }
+            }
         }
     }
 }

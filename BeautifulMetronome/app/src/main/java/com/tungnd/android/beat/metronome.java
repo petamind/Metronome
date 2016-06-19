@@ -12,8 +12,19 @@ public interface metronome {
      * Start the beat with tempo
      */
     void startBeat();
+
     /**
      * Stop the beat with tempo
      */
     void stopBeat();
+
+    /**
+     * Change to the next beat sound
+     */
+    void changeSound();
+
+    /**
+     * Set volume
+     */
+    void setVolume(float volume);
 }

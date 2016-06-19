@@ -31,28 +31,37 @@
             app:dsb_value="60" />
     </TableRow>
 
-    <include layout="@layout/table"/>
+    <include layout="@layout/table" />
     <!--<GridView-->
-        <!--android:id="@+id/gridview"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:gravity="center"-->
-        <!--android:horizontalSpacing="1dp"-->
-        <!--android:numColumns="6"-->
-        <!--android:layout_weight="3"-->
-        <!--android:nestedScrollingEnabled="true"-->
-        <!--android:stretchMode="columnWidth"-->
-        <!--android:theme="@style/MyButton"-->
-        <!--android:verticalSpacing="1dp" />-->
+    <!--android:id="@+id/gridview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:gravity="center"-->
+    <!--android:horizontalSpacing="1dp"-->
+    <!--android:numColumns="6"-->
+    <!--android:layout_weight="3"-->
+    <!--android:nestedScrollingEnabled="true"-->
+    <!--android:stretchMode="columnWidth"-->
+    <!--android:theme="@style/MyButton"-->
+    <!--android:verticalSpacing="1dp" />-->
 
     <Button
-        android:id="@+id/tap_tempo_text"
+        android:id="@+id/tap_tempo_btn"
         style="@style/MyDefaultTextAppearance"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_horizontal"
         android:text="Tap to set tempo here" />
+
+    <Button
+        android:id="@+id/change_sound_btn"
+        style="@style/MyDefaultTextAppearance"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:text="Change sound" />
 
     <TableRow
         android:layout_width="match_parent"

@@ -24,10 +24,10 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <com.tungnd.android.beat.BeatView
-                android:layout_gravity="right"
                 android:id="@+id/visual"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_gravity="right"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
@@ -42,14 +42,14 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_metronome_paralax"  />
+    <include layout="@layout/content_metronome_paralax" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_media_play"
-        android:layout_gravity="bottom|end"/>
+        android:src="@android:drawable/ic_media_play" />
 
 </android.support.design.widget.CoordinatorLayout>

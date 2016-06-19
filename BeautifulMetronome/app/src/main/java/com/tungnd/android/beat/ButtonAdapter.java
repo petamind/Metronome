@@ -16,18 +16,20 @@ import com.tungnd.android.metronome.R;
  * 20/30/45/60/
  * 75/90/100/120
  * 150/170/200/240
+ *
  * @deprecated as the gridview does not work well in CoordinatorLayout
  */
 public class ButtonAdapter extends BaseAdapter {
-    private final Context context;
-    private LayoutInflater layoutInflater;
     private static final int[] tempos = {20, 30, 45, 60,
             75, 90, 100, 120,
             150, 170, 200, 240};
+    private final Context context;
+    private LayoutInflater layoutInflater;
 
     public ButtonAdapter(Context context) {
         this.context = context;
-        this.layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
+        this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class ButtonAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Button button ;
+        Button button;
 
         if (convertView == null) {
             // if it's not recycled, initialize some attributes

@@ -16,9 +16,7 @@ public enum TimeSignalPatern {
     }
 
     /**
-     *
-     * @return
-     * Time signature as an integer array
+     * @return Time signature as an integer array
      * <p/>
      * 2 for main beat
      * <p/>

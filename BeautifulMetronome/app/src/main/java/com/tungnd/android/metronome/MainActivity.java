@@ -29,14 +29,35 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, metronome, DiscreteSeekBar.OnProgressChangeListener {
 
+    private static PlayerService playerService;
     private BeatView beatView;
     private boolean start;
-    private static PlayerService playerService;
     private Intent svc;
     private boolean doubleBackToExitPressedOnce;
     private DiscreteSeekBar tempoSeekBar;
     private DiscreteSeekBar volumeSeekBar;
+    private boolean mBound;
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
 
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.d("Service connected", this.toString());
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
+            playerService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.d("Service disconnected", this.toString());
+            mBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Button changeSoundButton = (Button) findViewById(R.id.change_sound_btn);
+        changeSoundButton.setOnClickListener(this);
 
         tempoSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
         tempoSeekBar.setOnProgressChangeListener(this);
@@ -66,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setupTableLayout();
 
     }
-
 
     /**
      * Create table of tempos
@@ -95,16 +118,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStart() {
         super.onStart();
+//        svc = new Intent(this, PlayerService.class);
+//        bindService(svc, mConnection, Context.BIND_AUTO_CREATE);
+//        startService(svc);
+    }
+
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        // Unbind from the service
+//        if (mBound) {
+//            unbindService(mConnection);
+//            mBound = false;
+//        }
+//    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         svc = new Intent(this, PlayerService.class);
         bindService(svc, mConnection, Context.BIND_AUTO_CREATE);
         startService(svc);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the service
+    protected void onPause() {
+        super.onPause();
         if (mBound) {
+            Log.d("onPause", "unbind the service connection "+ mConnection);
             unbindService(mConnection);
             mBound = false;
         }
@@ -146,6 +187,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.visual: {
                 start = !start;
                 startBeat();
+                break;
+            }
+            case R.id.change_sound_btn: {
+                changeSound();
+                break;
             }
             default:
                 break;
@@ -171,32 +217,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private boolean mBound;
-    /**
-     * Defines callbacks for service binding, passed to bindService()
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    @Override
+    public void changeSound() {
+        playerService.changeSound();
+    }
 
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            Log.d("Service connected", this.toString());
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
-            playerService = binder.getService();
-            mBound = true;
-        }
+    @Override
+    public void setVolume(float volume) {
 
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
+    }
 
     @Override
     public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-        switch (seekBar.getId()){
+        switch (seekBar.getId()) {
             case R.id.volumn_slider:
                 //change volume
                 break;
@@ -210,8 +243,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-        switch (seekBar.getId()){
-           case R.id.tempo_slider:
+        switch (seekBar.getId()) {
+            case R.id.tempo_slider:
                 playerService.stopBeat();
                 //change tempo
                 break;
@@ -220,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-        switch (seekBar.getId()){
+        switch (seekBar.getId()) {
             case R.id.tempo_slider:
                 //playerService.startBeat();
                 //change tempo

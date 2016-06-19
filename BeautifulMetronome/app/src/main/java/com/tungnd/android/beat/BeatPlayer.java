@@ -11,46 +11,46 @@ import com.tungnd.android.metronome.R;
  * Created by tungs on 6/11/2016.
  * Use sound pool to play beats
  * <link>http://www.101apps.co.za/index.php/articles/using-android-s-soundpool-class-a-tutorial.html</link>
- *
+ * <p/>
  * http://stackoverflow.com/questions/17069955/play-sound-using-soundpool-example
  * I prefer the background service so this class is replaced by PlayerService
  *
  * @deprecated
  */
-public class BeatPlayer implements Runnable{
+public class BeatPlayer implements Runnable {
+    int soundId;
     private SoundPool mSoundPool;
     private AudioAttributes attributes;
-    int soundId;
 
     public BeatPlayer(Context context) {
-       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-           attributes = new AudioAttributes.Builder()
-                   .setUsage(AudioAttributes.USAGE_MEDIA)
-                   .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                   .build();
-           this.mSoundPool = new SoundPool.Builder()
-                   .setAudioAttributes(attributes)
-                   .build();
-       } else {
-           mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-       }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            attributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build();
+            this.mSoundPool = new SoundPool.Builder()
+                    .setAudioAttributes(attributes)
+                    .build();
+        } else {
+            mSoundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        }
 
-       soundId = mSoundPool.load(context, R.raw.snd0, 1); // in 2nd param u have to pass your desire ringtone
+        soundId = mSoundPool.load(context, R.raw.snd0, 1); // in 2nd param u have to pass your desire ringtone
 
 
     }
 
-    public void play(){
-        mSoundPool.play(soundId, 1, 1, 0, 0 , 1);
+    public void play() {
+        mSoundPool.play(soundId, 1, 1, 0, 0, 1);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     synchronized (this) {
-                    //mSoundPool.pause(soundId);
+                        //mSoundPool.pause(soundId);
                         try {
                             this.wait(500);
-                            mSoundPool.play(soundId, 1, 1, 0, 0 , 1);
+                            mSoundPool.play(soundId, 1, 1, 0, 0, 1);
                             //this.wait(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -61,7 +61,7 @@ public class BeatPlayer implements Runnable{
         }).start();
     }
 
-    public void stop(){
+    public void stop() {
         this.mSoundPool.release();
     }
 

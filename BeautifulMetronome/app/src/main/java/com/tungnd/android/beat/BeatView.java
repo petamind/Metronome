@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.tungnd.android.metronome.R;
@@ -41,6 +40,11 @@ public class BeatView extends View implements metronome {
             invalidate();
         }
     };
+    /**
+     * To synchronize the visual with sound
+     */
+    private Object beatLock;
+    ;
     private Runnable mTick = new Runnable() {
         public void run() {
             synchronized (beatLock) {
@@ -57,11 +61,6 @@ public class BeatView extends View implements metronome {
             }
         }
     };
-    ;
-    /**
-     * To synchronize the visual with sound
-     */
-    private Object beatLock;
 
     public BeatView(Context context) {
         super(context);
@@ -159,5 +158,10 @@ public class BeatView extends View implements metronome {
     @Override
     public void stopBeat() {
         setBeating(false);
+    }
+
+    @Override
+    public void changeSound() {
+        throw new UnsupportedOperationException();
     }
 }
