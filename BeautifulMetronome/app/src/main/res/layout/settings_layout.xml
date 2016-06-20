@@ -7,8 +7,10 @@
     android:layout_below="@+id/visual"
     android:layout_margin="@dimen/activity_vertical_margin"
     android:orientation="vertical">
+    <include layout="@layout/beat_detail_layout"/>
 
     <TableRow
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -52,7 +54,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_horizontal"
-        android:text="Tap to set tempo here" />
+        android:text="5 taps to set tempo" />
 
     <Button
         android:id="@+id/change_sound_btn"

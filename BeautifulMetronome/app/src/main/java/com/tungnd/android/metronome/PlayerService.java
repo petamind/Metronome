@@ -38,7 +38,7 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
      */
     private SoundPool[] mSoundPools = new SoundPool[NUMBER_OF_SOUNDPOOLS];
     /**
-     * List of metronome sound IDs: currently supports 8 sounds
+     * List of metronome sound IDs: currently supports different 8 sounds
      */
     private int[] streamIds = new int[8];
     /**
