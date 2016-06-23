@@ -4,10 +4,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PersistableBundle;
+import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,11 +21,14 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tungnd.android.beat.BeatView;
+import com.tungnd.android.beat.TimeSignature;
 import com.tungnd.android.beat.metronome;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
@@ -38,8 +45,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean doubleBackToExitPressedOnce;
     private DiscreteSeekBar tempoSeekBar;
     private DiscreteSeekBar volumeSeekBar;
+    private FloatingActionButton fab;
     private int maxVolumeMusicStream;
     private boolean mBound;
+    private AudioManager audioManager;
+    private int curVolume;
+    private int timeSignatureIndex;
+    private TextView tempoTextView;
+    private TextView tempoNameTextView;
+    private TextView timeSignatureTextView;
+    private int isTapped6times;
+    private long[] tappedTimes;
+    private ImageButton tapTempoButton;
     /**
      * Defines callbacks for service binding, passed to bindService()
      */
@@ -62,20 +79,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mBound = false;
         }
     };
-    private AudioManager audioManager;
-    private int curVolume;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            isPlaying = savedInstanceState.getBoolean("PLAYING");
+        }
         setContentView(R.layout.activity_metronome_paralax);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Button changeSoundButton = (Button) findViewById(R.id.change_sound_btn);
-        changeSoundButton.setOnClickListener(this);
+
+        //---detail
+        this.tempoTextView = (TextView) findViewById(R.id.tempo_textview);
+        this.tempoNameTextView = (TextView) findViewById(R.id.tempo_name_textview);
+        this.timeSignatureTextView = (TextView) findViewById(R.id.time_signature_textview);
 
         //init tempo
         tempoSeekBar = (DiscreteSeekBar) findViewById(R.id.tempo_slider);
@@ -83,16 +103,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         //init float button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
         this.beatView = (BeatView) findViewById(R.id.visual);
-        beatView.setOnClickListener(this);
 
         setupTableLayout();
 
@@ -101,8 +114,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         volumeSeekBar = (DiscreteSeekBar) findViewById(R.id.volumn_slider);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         maxVolumeMusicStream = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        volumeSeekBar.setOnProgressChangeListener(this);
 
+        volumeSeekBar.setOnProgressChangeListener(this);
+        //----------------spinner
+//        HorizontalSpinner horizontalSpinner = (HorizontalSpinner) findViewById(R.id.horizontal_spinner);
+//        horizontalSpinner.setAdapter(new ArrayAdapter<String>(
+//        this, android.R.layout.simple_spinner_item,getResources().getStringArray(R.array.tempo_name)));
+        ImageButton timeSignature = (ImageButton) findViewById(R.id.change_time_signature_btn);
+        timeSignature.setOnClickListener(this);
+        ImageButton changeSoundButton = (ImageButton) findViewById(R.id.change_sound_btn);
+        changeSoundButton.setOnClickListener(this);
+        tapTempoButton = (ImageButton) findViewById(R.id.tap_tempo_btn);
+        tapTempoButton.setOnClickListener(this);
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putBoolean("PLAYING", isPlaying);
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     /**
@@ -110,32 +140,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void setupTableLayout() {
         runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TableLayout tableLayout = (TableLayout) findViewById(R.id.table);
-                LayoutInflater layoutInflater = getLayoutInflater();
-                for (int i = 0; i < 3; i++) {
-                    TableRow r = (TableRow) layoutInflater.inflate(R.layout.table_row, null);
-                    for (int j = 0; j < 4; j++) {
-                        Button b = (Button) layoutInflater.inflate(R.layout.button, null);
-                        b.setOnClickListener(MainActivity.this);
-                        b.setText("" + metronome.tempos[i * 4 + j]);
-                        r.addView(b);
-                    }
-                    tableLayout.addView(r);
-                }
-            }
-        });
+                          @Override
+                          public void run() {
+                              TableLayout tableLayout = (TableLayout) findViewById(R.id.table);
+                              LayoutInflater layoutInflater = getLayoutInflater();
+                              final int ii;
+                              final int jj;
+                              if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                  ii = 2;
+                              } else {
+                                  ii = 3;
+                              }
+                              jj = metronome.tempos.length / ii;
 
+                              for (int i = 0; i < ii; i++) {
+                                  TableRow r = (TableRow) layoutInflater.inflate(R.layout.table_row, null);
+                                  for (int j = 0; j < jj; j++) {
+                                      Button b = (Button) layoutInflater.inflate(R.layout.button, null);
+                                      b.setOnClickListener(MainActivity.this);
+                                      b.setText("" + metronome.tempos[i * jj + j]);
+                                      r.addView(b);
+                                  }
+                                  tableLayout.addView(r);
+                              }
+                          }
+                      }
+
+        );
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        svc = new Intent(this, PlayerService.class);
-//        bindService(svc, mConnection, Context.BIND_AUTO_CREATE);
-//        startService(svc);
-    }
 
 //    @Override
 //    protected void onStop() {
@@ -163,6 +196,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    /**
+     * 5 taps to set the tempo and start the metronome
+     */
+    private void tapToTempo() {
+        Log.d("tap", isTapped6times +"");
+        if (isTapped6times == 5) {
+            this.tapTempoButton.setEnabled(false);
+            Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrate for 500 milliseconds
+            v.vibrate(300);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    isTapped6times = 0;
+                    tapTempoButton.setEnabled(true);
+                }
+            }, 4000);
+            //TODO set tempo
+            long l = (this.tappedTimes[tappedTimes.length-2] - this.tappedTimes[0])/(tappedTimes.length-2);
+            int tempo = (int) (60000 / l);
+            Log.d("tap", l +":" +tempo);
+            this.tempoSeekBar.setProgress(tempo);
+            isPlaying = true;
+            this.startBeat();
+            updateUI();
+            Toast.makeText(this, "New tempo is set!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (tappedTimes == null) {
+            this.tappedTimes = new long[6];
+        }
+        this.stopBeat();
+        playerService.playCurrentSound();
+        this.tappedTimes[isTapped6times] = System.currentTimeMillis();
+        Log.d("tap", this.tappedTimes[isTapped6times] +"");
+        this.isTapped6times = ++isTapped6times % tappedTimes.length;
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isTapped6times = 0;
+            }
+        }, 10000);//reset if tap is longer than 2.5 secs
     }
 
     @Override
@@ -216,17 +295,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.visual: {
+            case R.id.fab:
                 isPlaying = !isPlaying;
                 startBeat();
+                updateUI();
                 break;
-            }
             case R.id.change_sound_btn: {
                 changeSound();
+                Snackbar.make(v, "Sound is changed", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
                 break;
             }
+
+            case R.id.tap_tempo_btn: {
+                tapToTempo();
+                if(isTapped6times==0 )
+                Snackbar.make(v, "Tap 5 times to set tempo and start", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                break;
+            }
+
+            case R.id.change_time_signature_btn: {
+                timeSignatureIndex = ++timeSignatureIndex % TimeSignature.values().length;
+                beatView.setBeatSequence(TimeSignature.values()[timeSignatureIndex].getBeatSequence());
+                this.timeSignatureTextView.setText(TimeSignature.values()[timeSignatureIndex].getName(timeSignatureIndex));
+                Snackbar.make(v, "Time signature visualization is changed", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                break;
+            }
+
+            case R.id.button: {
+                String temp = ((Button) v).getText() + "";
+                this.tempoSeekBar.setProgress(Integer.parseInt(temp));
+                this.tempoTextView.setText(temp);
+            }
+
             default:
                 break;
+        }
+
+    }
+
+    private void updateUI() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (isPlaying) {
+                fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause, this.getTheme()));
+            } else {
+                fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play, this.getTheme()));
+            }
+        } else {
+            if (isPlaying) {
+                fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+            } else {
+                fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
+            }
         }
     }
 
@@ -257,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void setVolume(float volume) {
         curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        volumeSeekBar.setProgress(100 * curVolume / maxVolumeMusicStream );
+        volumeSeekBar.setProgress(100 * curVolume / maxVolumeMusicStream);
     }
 
     @Override
@@ -272,6 +394,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tempo_slider:
                 playerService.setTempo(tempoSeekBar.getProgress());
+                this.tempoTextView.setText(tempoSeekBar.getProgress() + "");
                 //change tempo
                 break;
         }
@@ -292,7 +415,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
         switch (seekBar.getId()) {
             case R.id.tempo_slider:
-                //playerService.startBeat();
+                if (isPlaying) {
+                    playerService.startBeat();
+                }
                 //change tempo
                 break;
         }

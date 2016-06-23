@@ -1,25 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-   >
+    android:orientation="horizontal">
+
     <TextView
+        android:id="@+id/time_signature_textview"
+        style="@style/MyDefaultTextAppearance"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="Moderato"
-        android:layout_gravity="center_vertical"
-        />
+        android:gravity="left|center_vertical"
+        android:text="4/4" />
+
     <TextView
+        android:id="@+id/tempo_name_textview"
+        style="@style/MyDefaultTextAppearance"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:text="Moderato" />
+
+    <TextView
+        android:id="@+id/tempo_textview"
+        style="@style/MyDefaultTextAppearance"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="100"
-        android:gravity="center"/>
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:text="4/4"
-        android:gravity="right|center_vertical"/>
+        android:gravity="right|center_vertical"
+        android:text="100" />
+
+    <!--<com.tungnd.android.widget.HorizontalSpinner-->
+        <!--android:id="@+id/horizontal_spinner"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent" />-->
+
+
 </LinearLayout>

@@ -69,7 +69,7 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
         //but the issue is only noticeable in under 170 BPM
         if(this.tempo < 170)
         {
-            mSoundPools[1].play(streamIds[0], 0, 0, 0,-1, 1f);
+           playDummySound();
         }
     }
 
@@ -84,6 +84,13 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
     public void changeSound() {
         soundIndex = ++soundIndex % streamIds.length;
         Log.d(this.toString(), "Sound index: " + soundIndex);
+    }
+
+    /**
+     * a convenience method to play a sound
+     */
+    public void playCurrentSound(){
+        mSoundPools[0].play(streamIds[soundIndex], volume, volume, 10, 0, 1.0f);
     }
 
     @Override
@@ -159,7 +166,15 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
         this.tempo = tempo;
         if (tempo > 0) {
             setBeatInterval(60000 / tempo);
+            if(tempo <170){
+                playDummySound();
+            }
         }
+    }
+
+    private void playDummySound() {
+        mSoundPools[1].stop(streamIds[0]);
+        mSoundPools[1].play(streamIds[0], 0, 0, 0,-1, 1f);
     }
 
     private void setBeatInterval(long beatInterval) {

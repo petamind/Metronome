@@ -1,11 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+        <!--<item name="colorAccent">@color/colorAccent</item>-->
     </style>
 
     <style name="MyButton" parent="Theme.AppCompat.Light">
@@ -16,6 +16,7 @@
     <style name="MyDefaultTextAppearance" parent="@android:style/TextAppearance">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/setting_textsize</item>
+        <item name="android:textColor">#A0A0A0</item>
     </style>
 
     <style name="MySliderTextAppearance" parent="MyDefaultTextAppearance">

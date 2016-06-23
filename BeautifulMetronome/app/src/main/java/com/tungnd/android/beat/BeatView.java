@@ -14,6 +14,7 @@ import com.tungnd.android.metronome.R;
 
 /**
  * Created by tungs on 6/10/2016.
+ *
  * Visualize beats with simple circles
  */
 public class BeatView extends View implements metronome {
@@ -34,7 +35,7 @@ public class BeatView extends View implements metronome {
     /**
      * This sequence is used to stimulate the time signature
      */
-    private int[] beatSequence = TimeSignalPatern.t4_4.getBeatSequence();
+    private int[] beatSequence = TimeSignature.t4_4.getBeatSequence();
     private int beatDrawIndex = 0;
     private Handler mHandler = new Handler() {
         @Override
@@ -145,6 +146,10 @@ public class BeatView extends View implements metronome {
         }
 
         beatDrawIndex = ++beatDrawIndex % beatSequence.length;
+    }
+
+    public void setBeatSequence(int[] beatSequence) {
+        this.beatSequence = beatSequence;
     }
 
     @Override

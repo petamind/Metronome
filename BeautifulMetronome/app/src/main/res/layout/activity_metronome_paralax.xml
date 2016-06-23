@@ -8,6 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context="com.tungnd.android.metronome.MainActivity">
 
+    <!--android:background="@color/colorPrimaryDark"-->
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
@@ -23,21 +24,37 @@
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <com.tungnd.android.beat.BeatView
+                android:id="@+id/visual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_collapseMode="parallax"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="parallax"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
-            </android.support.v7.widget.Toolbar>
-
-            <com.tungnd.android.beat.BeatView
-                android:id="@+id/visual"
-                android:layout_width="match_parent"
+            <ImageButton
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                android:src="@android:drawable/ic_menu_share"
+                android:background="@android:color/transparent"
+                android:layout_gravity="bottom|right"
+                app:layout_collapseMode="none"
+                android:layout_margin="@dimen/activity_vertical_margin"/>
+            <ImageButton
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/btn_star"
+                android:background="@android:color/transparent"
+                android:layout_gravity="center_vertical|right"
+                app:layout_collapseMode="none"
+                android:layout_margin="@dimen/activity_vertical_margin"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
@@ -48,7 +65,7 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
+        android:layout_gravity="center|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_media_play" />
 

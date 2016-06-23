@@ -32,6 +32,22 @@
             app:dsb_max="300"
             app:dsb_min="20"
             app:dsb_value="60" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_action_volume" />
+
+        <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+            android:id="@+id/volumn_slider"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            app:dsb_indicatorColor="@android:color/holo_green_light"
+            app:dsb_indicatorTextAppearance="@style/MySliderTextAppearance"
+            app:dsb_max="100"
+            app:dsb_min="0" />
     </TableRow>
 
     <include layout="@layout/table" />
@@ -59,8 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center_horizontal"
-            android:src="@drawable/ic_action_tap"
-            android:text="5 taps to set tempo" />
+            android:src="@drawable/ic_action_tap" />
 
         <ImageButton
             android:id="@+id/change_time_signature_btn"
@@ -69,8 +84,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_horizontal"
-            android:src="@drawable/ic_action_pulse"
-            android:text="Change sound" />
+            android:src="@drawable/ic_action_pulse" />
     </LinearLayout>
 
     <TableRow
@@ -78,21 +92,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_action_volume" />
 
-        <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-            android:id="@+id/volumn_slider"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            app:dsb_indicatorColor="@android:color/holo_green_light"
-            app:dsb_indicatorTextAppearance="@style/MySliderTextAppearance"
-            app:dsb_max="100"
-            app:dsb_min="0" />
     </TableRow>
 
 </LinearLayout>
