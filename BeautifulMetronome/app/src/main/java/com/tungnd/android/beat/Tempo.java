@@ -1,17 +1,29 @@
 package com.tungnd.android.beat;
 
+import android.content.Context;
+
+import com.tungnd.android.metronome.R;
+
 /**
  * Created by tunguyen on 14/06/2016.
  * It will be harder for translation tempos
  * TODO:
  */
-public enum Tempo {
-    GRAVE("GRAVE", new int[]{20, 35});
-    private String name;
-    private int[] range;
+public class Tempo {
+    public final static int DEFAULT_TEMPO = 100;
+    static String[] names;
+    static int[] tempos;
 
-    Tempo(String name, int[] range) {
-        this.name = name;
-        this.range = range;
+    public static String getTempoName(Context c, int tempo){
+        if(names==null){
+            names = c.getResources().getStringArray(R.array.tempo_name);
+            tempos = c.getResources().getIntArray(R.array.tempo_vals);
+        }
+        for (int i = 0; i < names.length; i++) {
+            if(tempo<= tempos[i]){
+                return names[i];
+            }
+        }
+        return null;
     }
 }

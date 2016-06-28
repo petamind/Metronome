@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:id="@+id/settings"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -19,6 +20,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:onClick="decreaseTempo"
             android:src="@drawable/ic_action_music_note" />
 
         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
@@ -31,7 +33,7 @@
             app:dsb_indicatorTextAppearance="@style/MySliderTextAppearance"
             app:dsb_max="300"
             app:dsb_min="20"
-            app:dsb_value="60" />
+            app:dsb_value="100" />
     </TableRow>
 
     <include layout="@layout/table" />
@@ -40,7 +42,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
 
         <ImageButton
             android:id="@+id/change_sound_btn"
@@ -81,6 +82,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:onClick="decreaseVolume"
             android:src="@drawable/ic_action_volume" />
 
         <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Métronome-X</string>
+    <string name="confirm_exit">Cliquer deux fois sur le bouton BACK pour quitter</string>
+
+    <string name="title_activity_metronome_paralax">Métronome - X</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="share_text">Ceci est le meilleur métronome! Essayez-le :)!</string>
+    <string name="share_via">Partage via</string>
+    <string name="rate_text">Merci de votre évaluation de l\'application!</string>
+    <string name="change_sound">Change to the next sound</string>
+    <string name="sound_changed">Metronome sound is changed</string>
+    <string name="tap2temp">Tap 5+ times to set tempo and start</string>
+    <string name="gui_intro">"Metronome - X.\nLe métronome le plus précis avec une conception de matériel simple, convivial qui aide les utilisateurs à se concentrer pleinement sur la pratique."</string>
+    <!--<string name="gui_intro">"Thanks for using Metronome - X.\nThis app simulates an accurate"-->
+
+    <!--"metronome with a simple, friendly material design that helps users focus fully on practice. Users can quickly change tempo, sound, time signature visual with intuitive buttons change tempo, sound, time signature visual with intuitive buttons"</string>-->
+    <string name="change_time_signal">Changer temps signature visualisation</string>
+    <string name="slider_intro">Appuyez sur les icônes pour réduire la valeur de 1</string>
+</resources>

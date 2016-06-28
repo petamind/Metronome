@@ -10,7 +10,6 @@ public enum TimeSignature {
     t6_8(2, 0, 1, 0, 1, 0, 2, 0, 1, 0, 1, 0);
 
     private int[] beatSequence;
-    private String name;
 
     TimeSignature(int... beatSequence) {
         this.beatSequence = beatSequence;
@@ -31,12 +30,18 @@ public enum TimeSignature {
     }
 
     public String getName(int index) {
-        switch (index){
-            case 0: return "4/4";
-            case 1: return "3/4";
-            case 2: return "2/4";
-            case 3: return "6/8";
+        switch (index) {
+            case 0:
+                return "4/4";
+            case 1:
+                return "3/4";
+            case 2:
+                return "2/4";
+            case 3:
+                return "6/8";
+            default:
+                break;
         }
-        return name;
+        return "X/Y";
     }
 }

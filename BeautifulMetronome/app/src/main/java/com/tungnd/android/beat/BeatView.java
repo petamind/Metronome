@@ -18,7 +18,7 @@ import com.tungnd.android.metronome.R;
  * Visualize beats with simple circles
  */
 public class BeatView extends View implements metronome {
-    private int tempo = 60;
+    private int tempo = Tempo.DEFAULT_TEMPO;
     /**
      * cirle diameter
      */
@@ -128,7 +128,7 @@ public class BeatView extends View implements metronome {
 
         if (paint == null) {
             paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setColor(getResources().getColor(R.color.colorAccent));
+            paint.setColor(getResources().getColor(android.R.color.holo_blue_dark));
         }
 
         //Log.d(this.toString(), x + ": " + y + ": " + beatDrawIndex);
@@ -150,6 +150,7 @@ public class BeatView extends View implements metronome {
 
     public void setBeatSequence(int[] beatSequence) {
         this.beatSequence = beatSequence;
+        this.beatDrawIndex  = 0;//reset
     }
 
     @Override

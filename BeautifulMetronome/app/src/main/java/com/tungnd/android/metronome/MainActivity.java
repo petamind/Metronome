@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,8 +15,9 @@ import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -27,7 +29,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.tungnd.android.beat.BeatView;
+import com.tungnd.android.beat.Tempo;
 import com.tungnd.android.beat.TimeSignature;
 import com.tungnd.android.beat.metronome;
 
@@ -57,6 +64,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int isTapped6times;
     private long[] tappedTimes;
     private ImageButton tapTempoButton;
+    private Snackbar snackbar;
+    private AlertDialog alertDialog;
+    private AdView adView;
+    /**
+     * TODO: setup in app purchase
+     */
+    private boolean isPremium;
+    InterstitialAd mInterstitialAd;
     /**
      * Defines callbacks for service binding, passed to bindService()
      */
@@ -83,13 +98,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         if (savedInstanceState != null) {
             isPlaying = savedInstanceState.getBoolean("PLAYING");
         }
         setContentView(R.layout.activity_metronome_paralax);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
 
         //---detail
@@ -126,6 +142,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         changeSoundButton.setOnClickListener(this);
         tapTempoButton = (ImageButton) findViewById(R.id.tap_tempo_btn);
         tapTempoButton.setOnClickListener(this);
+        //-------ads
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.interestial));
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+            }
+        });
+
+        requestNewInterstitial();
+        if(!isPremium) {
+            adView = (AdView) findViewById(R.id.adview);
+            AdRequest adRequest = new AdRequest.Builder()
+//                    .addTestDevice("60551B196128C8441C4EBC953EE4CB48")
+                    .build();
+            adView.loadAd(adRequest);
+        }
 
     }
 
@@ -170,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-//    @Override
+    //    @Override
 //    protected void onStop() {
 //        super.onStop();
 //        // Unbind from the service
@@ -186,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         svc = new Intent(this, PlayerService.class);
         bindService(svc, mConnection, Context.BIND_AUTO_CREATE);
         startService(svc);
+
     }
 
     @Override
@@ -202,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 5 taps to set the tempo and start the metronome
      */
     private void tapToTempo() {
-        Log.d("tap", isTapped6times +"");
+        Log.d("tap", isTapped6times + "");
         if (isTapped6times == 5) {
             this.tapTempoButton.setEnabled(false);
             Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
@@ -216,9 +252,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }, 4000);
             //TODO set tempo
-            long l = (this.tappedTimes[tappedTimes.length-2] - this.tappedTimes[0])/(tappedTimes.length-2);
+            long l = (this.tappedTimes[tappedTimes.length - 2] - this.tappedTimes[0]) / (tappedTimes.length - 2);
             int tempo = (int) (60000 / l);
-            Log.d("tap", l +":" +tempo);
+            Log.d("tap", l + ":" + tempo);
             this.tempoSeekBar.setProgress(tempo);
             isPlaying = true;
             this.startBeat();
@@ -233,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.stopBeat();
         playerService.playCurrentSound();
         this.tappedTimes[isTapped6times] = System.currentTimeMillis();
-        Log.d("tap", this.tappedTimes[isTapped6times] +"");
+        Log.d("tap", this.tappedTimes[isTapped6times] + "");
         this.isTapped6times = ++isTapped6times % tappedTimes.length;
 
         new Handler().postDelayed(new Runnable() {
@@ -244,9 +280,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }, 10000);//reset if tap is longer than 2.5 secs
     }
 
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("SEE_YOUR_LOGCAT_TO_GET_YOUR_DEVICE_ID")
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
+
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
+            if (mInterstitialAd.isLoaded()) {
+                mInterstitialAd.show();
+            }
             super.onBackPressed();
             return;
         }
@@ -276,6 +323,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
                 setVolume(0);
                 return true;
+            case KeyEvent.KEYCODE_BACK:
+                this.onBackPressed();
+                return true;
             default:
                 return false;
         }
@@ -302,16 +352,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.change_sound_btn: {
                 changeSound();
-                Snackbar.make(v, "Sound is changed", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+                snackbar = Snackbar.make(v, R.string.sound_changed, Snackbar.LENGTH_LONG)
+                        .setAction("Action", null);
+                snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                snackbar.show();
                 break;
             }
 
             case R.id.tap_tempo_btn: {
                 tapToTempo();
-                if(isTapped6times==0 )
-                Snackbar.make(v, "Tap 5 times to set tempo and start", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (isTapped6times == 0)
+                    Snackbar.make(v, R.string.tap2temp, Snackbar.LENGTH_LONG)
+                            .show();
                 break;
             }
 
@@ -358,8 +411,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             beatView.setBeatLock(playerService);//sync with sound
             playerService.startBeat();
             beatView.startBeat();
+            if(adView!= null){
+                adView.setVisibility(View.INVISIBLE);
+            }
         } else {
             stopBeat();
+            if(adView!= null&&!isPremium){
+                adView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -395,10 +454,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tempo_slider:
                 playerService.setTempo(tempoSeekBar.getProgress());
                 this.tempoTextView.setText(tempoSeekBar.getProgress() + "");
+                this.tempoNameTextView.setText(Tempo.getTempoName(this,tempoSeekBar.getProgress()));
                 //change tempo
                 break;
         }
-
     }
 
     @Override
@@ -420,6 +479,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 //change tempo
                 break;
+        }
+    }
+
+    /**
+     * Share to social media
+     *
+     * @param view
+     */
+    public void share(View view) {
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text));
+        startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
+    }
+
+    /**
+     * Rate this best app
+     *
+     * @param view
+     */
+    public void rate(View view) {
+        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+        Toast.makeText(this, R.string.rate_text, Toast.LENGTH_LONG).show();
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
+    }
+
+    public void help(View view) {
+        if(alertDialog == null) {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            // ...Irrelevant code for customizing the buttons and title
+            LayoutInflater inflater = this.getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.help_layout, null);
+            dialogBuilder.setView(dialogView);
+            alertDialog = dialogBuilder.create();
+            dialogView.findViewById(R.id.linearlayout).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    alertDialog.dismiss();
+                }
+            });
+        }
+
+        alertDialog.show();
+    }
+
+    public void decreaseTempo(View view) {
+        int tempo = this.tempoSeekBar.getProgress();
+        if(tempo>20){
+            this.tempoSeekBar.setProgress(--tempo);
+        }
+    }
+
+    public void decreaseVolume(View view) {
+        int vol = this.volumeSeekBar.getProgress();
+        if(vol>0){
+            this.volumeSeekBar.setProgress(--vol);
         }
     }
 }

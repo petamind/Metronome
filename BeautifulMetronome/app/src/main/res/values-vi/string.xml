@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Máy đánh nhịp - X</string>
+    <string name="confirm_exit">Nhấn 2 lần để thoát ứng dụng</string>
+
+    <string name="title_activity_metronome_paralax">Máy Đánh Nhịp - X</string>
+
+    <string name="action_settings">Cài đặt</string>
+    <string name="share_text">Phần mềm đánh nhịp tốt cho các bạn học nhạc! Thử nhé :)!</string>
+    <string name="share_via">Chia sẻ</string>
+    <string name="rate_text">Cảm ơn bạn đánh giá phần mềm!</string>
+    <string name="change_sound">Thay đổi sang âm thanh khác</string>
+    <string name="sound_changed">Âm thanh đã thay đổi</string>
+    <string name="tap2temp">Xác định nhịp bằng cách chạm 5+ lần</string>
+    <string name="gui_intro">"Máy đánh nhịp - X.\nMáy đánh nhịp chuẩn"
+
+        ", thiết kế đơn giản, thân thiện, giúp người dùng tập trung tối đa."</string>
+    <!--<string name="gui_intro">"Thanks for using Metronome - X.\nThis app simulates an accurate"-->
+
+    <!--"metronome with a simple, friendly material design that helps users focus fully on practice. Users can quickly change tempo, sound, time signature visual with intuitive buttons change tempo, sound, time signature visual with intuitive buttons"</string>-->
+    <string name="change_time_signal">Thay đổi phân số chỉ nhịp</string>
+    <string name="slider_intro">Bấm vào biểu tương để giảm giá trị đi 1</string>
+</resources>
