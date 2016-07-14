@@ -19,7 +19,7 @@ import java.util.TimerTask;
 /**
  * Created by tungs on 6/10/2016.
  * As described by stackoverflow, it is not good with Media player and thread for metronome
- * but it is a good to try with background and soundpool
+ * but it is a good to try with background and soundpool3z
  * http://stackoverflow.com/questions/21043059/play-background-sound-in-android-applications
  * <p/>
  * http://stackoverflow.com/questions/5580537/androidsound-pool-and-service

@@ -133,9 +133,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         volumeSeekBar.setOnProgressChangeListener(this);
         //----------------spinner
-//        HorizontalSpinner horizontalSpinner = (HorizontalSpinner) findViewById(R.id.horizontal_spinner);
-//        horizontalSpinner.setAdapter(new ArrayAdapter<String>(
-//        this, android.R.layout.simple_spinner_item,getResources().getStringArray(R.array.tempo_name)));
         ImageButton timeSignature = (ImageButton) findViewById(R.id.change_time_signature_btn);
         timeSignature.setOnClickListener(this);
         ImageButton changeSoundButton = (ImageButton) findViewById(R.id.change_sound_btn);

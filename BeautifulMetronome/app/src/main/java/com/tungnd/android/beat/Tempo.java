@@ -6,8 +6,6 @@ import com.tungnd.android.metronome.R;
 
 /**
  * Created by tunguyen on 14/06/2016.
- * It will be harder for translation tempos
- * TODO:
  */
 public class Tempo {
     public final static int DEFAULT_TEMPO = 100;
