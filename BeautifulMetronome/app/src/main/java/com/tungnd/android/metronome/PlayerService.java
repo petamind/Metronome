@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.tungnd.android.beat.Tempo;
 import com.tungnd.android.beat.metronome;
 
 import java.util.Timer;
@@ -52,7 +53,7 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
     /**
      * tempo of metronome, default 60BPM
      */
-    private int tempo = 60;
+    private int tempo = Tempo.DEFAULT_TEMPO;
     /**
      * time in miliseconds between 2 beats
      */
