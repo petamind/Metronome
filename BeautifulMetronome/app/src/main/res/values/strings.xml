@@ -56,4 +56,5 @@
     <string name="banner" translatable="false">ca-app-pub-8792490037625373/9808708245</string>
     <string name="change_time_signal">Change time signature visualization</string>
     <string name="slider_intro">Press slider icons to reduce value by 1</string>
+    <string name="pause">Pause</string>
 </resources>

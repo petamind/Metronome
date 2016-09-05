@@ -51,7 +51,7 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
     private Timer timer;
     private IBinder mIBinder = new LocalBinder();
     /**
-     * tempo of metronome, default 60BPM
+     * tempo of metronome, default 100BPM
      */
     private int tempo = Tempo.DEFAULT_TEMPO;
     /**
@@ -206,7 +206,7 @@ public class PlayerService extends Service implements SoundPool.OnLoadCompleteLi
         if (status == 0) {
             Log.d(this.toString(), "Load sounds complete");
             isResourceReady = true;
-            setTempo(60);
+            setTempo(tempo);
         } else {
             Toast.makeText(this, "Error loading media files", Toast.LENGTH_SHORT).show();
             isResourceReady = false;

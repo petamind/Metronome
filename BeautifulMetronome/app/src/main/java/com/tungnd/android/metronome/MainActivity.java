@@ -1,9 +1,12 @@
 package com.tungnd.android.metronome;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -15,6 +18,7 @@ import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -56,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int maxVolumeMusicStream;
     private boolean mBound;
     private AudioManager audioManager;
-    private int curVolume;
     private int timeSignatureIndex;
     private TextView tempoTextView;
     private TextView tempoNameTextView;
@@ -64,14 +67,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int isTapped6times;
     private long[] tappedTimes;
     private ImageButton tapTempoButton;
-    private Snackbar snackbar;
     private AlertDialog alertDialog;
     private AdView adView;
+    private NotificationManager mNotificationManager;
     /**
      * TODO: setup in app purchase
      */
     private boolean isPremium;
-    InterstitialAd mInterstitialAd;
+    private InterstitialAd mInterstitialAd;
     /**
      * Defines callbacks for service binding, passed to bindService()
      */
@@ -85,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
             playerService = binder.getService();
             mBound = true;
+            beatView.setBeatLock(playerService);//sync with sound
             setVolume(0);//sync current volume
         }
 
@@ -94,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mBound = false;
         }
     };
+    private int mId = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         if (savedInstanceState != null) {
             isPlaying = savedInstanceState.getBoolean("PLAYING");
+            Log.d("onCreate", "play state: " + isPlaying);
         }
         setContentView(R.layout.activity_metronome_paralax);
 
@@ -151,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         requestNewInterstitial();
-        if(!isPremium) {
+        if (!isPremium) {
             adView = (AdView) findViewById(R.id.adview);
             AdRequest adRequest = new AdRequest.Builder()
 //                    .addTestDevice("60551B196128C8441C4EBC953EE4CB48")
@@ -159,13 +165,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             adView.loadAd(adRequest);
         }
 
+        mNotificationManager = (NotificationManager)
+                getSystemService(NOTIFICATION_SERVICE);
+
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putBoolean("PLAYING", isPlaying);
-        super.onSaveInstanceState(outState, outPersistentState);
+
+    private void notification() {
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, MainActivity.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, mId,
+                resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_metronome)
+                        .setContentTitle(getString(R.string.app_name))
+                        //.addAction(android.R.drawable.ic_media_pause, getString(R.string.pause), pendingIntent)
+                        //.addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(android.R.string.cancel), pendingIntent)
+                        .setOngoing(true)
+                        .setContentText(tempoSeekBar.getProgress() + " BPM (" + tempoNameTextView.getText() + ")")
+                        .setAutoCancel(false);
+        mBuilder.setContentIntent(pendingIntent);
+
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(mId, mBuilder.build());
     }
+//
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        outState.putBoolean("PLAYING", isPlaying);
+//        Log.d("onSave", "playing " + isPlaying);
+//        super.onSaveInstanceState(outState);
+//    }
+
 
     /**
      * Create table of tempos
@@ -201,34 +234,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
     }
 
-
-    //    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        // Unbind from the service
-//        if (mBound) {
-//            unbindService(mConnection);
-//            mBound = false;
-//        }
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind to LocalService
+        if (svc == null) {
+            svc = new Intent(this, PlayerService.class);
+        }
+        bindService(svc, mConnection, Context.BIND_AUTO_CREATE);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        svc = new Intent(this, PlayerService.class);
-        bindService(svc, mConnection, Context.BIND_AUTO_CREATE);
-        startService(svc);
-
+        Log.d("onResume", "resume");
+        mNotificationManager.cancelAll();
+        updateUI();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("onPause", "pause");
+        if (isPlaying) {
+            notification();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
         if (mBound) {
-            Log.d("onPause", "unbind the service connection " + mConnection);
+            Log.d("stop beat", "unbind the service connection " + mConnection);
             unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopBeat();
     }
 
     /**
@@ -291,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (mInterstitialAd.isLoaded()) {
                 mInterstitialAd.show();
             }
+            isPlaying = false;
             super.onBackPressed();
             return;
         }
@@ -328,11 +376,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopBeat();
-    }
 
     /**
      * In general, click on the Beat View will isPlaying the beat
@@ -350,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.change_sound_btn: {
                 changeSound();
 
-                snackbar = Snackbar.make(v, R.string.sound_changed, Snackbar.LENGTH_LONG)
+                Snackbar snackbar = Snackbar.make(v, R.string.sound_changed, Snackbar.LENGTH_LONG)
                         .setAction("Action", null);
                 snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
                 snackbar.show();
@@ -390,12 +433,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (isPlaying) {
                 fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause, this.getTheme()));
+                beatView.startBeat();
             } else {
                 fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play, this.getTheme()));
             }
         } else {
             if (isPlaying) {
                 fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
+//                beatView.startBeat();
             } else {
                 fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
             }
@@ -405,15 +450,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void startBeat() {
         if (isPlaying) {
-            beatView.setBeatLock(playerService);//sync with sound
+            Log.d("start beat", "start");
+
+            startService(svc);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+            //beatView.setBeatLock(playerService);//sync with sound
             playerService.startBeat();
             beatView.startBeat();
-            if(adView!= null){
+            if (adView != null) {
                 adView.setVisibility(View.INVISIBLE);
             }
         } else {
             stopBeat();
-            if(adView!= null&&!isPremium){
+
+            if (adView != null && !isPremium) {
                 adView.setVisibility(View.VISIBLE);
             }
         }
@@ -422,10 +472,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void stopBeat() {
         if (svc != null) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             playerService.stopBeat();
             beatView.stopBeat();
+            stopService(svc);
         }
     }
+
+
 
     @Override
     public void changeSound() {
@@ -434,7 +488,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void setVolume(float volume) {
-        curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         volumeSeekBar.setProgress(100 * curVolume / maxVolumeMusicStream);
     }
 
@@ -451,7 +505,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.tempo_slider:
                 playerService.setTempo(tempoSeekBar.getProgress());
                 this.tempoTextView.setText(tempoSeekBar.getProgress() + "");
-                this.tempoNameTextView.setText(Tempo.getTempoName(this,tempoSeekBar.getProgress()));
+                this.tempoNameTextView.setText(Tempo.getTempoName(this, tempoSeekBar.getProgress()));
                 //change tempo
                 break;
         }
@@ -507,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void help(View view) {
-        if(alertDialog == null) {
+        if (alertDialog == null) {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
             // ...Irrelevant code for customizing the buttons and title
             LayoutInflater inflater = this.getLayoutInflater();
@@ -527,14 +581,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void decreaseTempo(View view) {
         int tempo = this.tempoSeekBar.getProgress();
-        if(tempo>20){
+        if (tempo > 20) {
             this.tempoSeekBar.setProgress(--tempo);
         }
     }
 
     public void decreaseVolume(View view) {
         int vol = this.volumeSeekBar.getProgress();
-        if(vol>0){
+        if (vol > 0) {
             this.volumeSeekBar.setProgress(--vol);
         }
     }
