@@ -472,10 +472,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void stopBeat() {
         if (svc != null) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
             playerService.stopBeat();
             beatView.stopBeat();
             stopService(svc);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
     }
 
