@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
             playerService = binder.getService();
+            playerService.setTempo(tempoSeekBar.getProgress());
             mBound = true;
-            beatView.setBeatLock(playerService);//sync with sound
             setVolume(0);//sync current volume
         }
 
@@ -104,15 +104,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        if (savedInstanceState != null) {
-            isPlaying = savedInstanceState.getBoolean("PLAYING");
-            Log.d("onCreate", "play state: " + isPlaying);
-        }
+
         setContentView(R.layout.activity_metronome_paralax);
-
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
 
         //---detail
         this.tempoTextView = (TextView) findViewById(R.id.tempo_textview);
@@ -168,6 +161,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mNotificationManager = (NotificationManager)
                 getSystemService(NOTIFICATION_SERVICE);
 
+        if (savedInstanceState != null) {
+            //isPlaying = savedInstanceState.getBoolean("PLAYING");
+            tempoSeekBar.setProgress(savedInstanceState.getInt("TEMPO"));
+            timeSignatureIndex = savedInstanceState.getInt("TIMESIGN");
+            beatView.setBeatSequence(TimeSignature.values()[timeSignatureIndex].getBeatSequence());
+            Log.d("onCreate", "play state: " + isPlaying +": "+tempoSeekBar.getProgress());
+        } else {
+            tempoSeekBar.setProgress(Tempo.DEFAULT_TEMPO);
+        }
+
     }
 
 
@@ -191,13 +194,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // mId allows you to update the notification later on.
         mNotificationManager.notify(mId, mBuilder.build());
     }
-//
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        outState.putBoolean("PLAYING", isPlaying);
-//        Log.d("onSave", "playing " + isPlaying);
-//        super.onSaveInstanceState(outState);
-//    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("PLAYING", isPlaying);
+        outState.putInt("TEMPO", tempoSeekBar.getProgress());
+        outState.putInt("TIMESIGN", timeSignatureIndex);
+        Log.d("onSave", "playing " + isPlaying);
+        super.onSaveInstanceState(outState);
+    }
 
 
     /**
@@ -262,20 +267,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
+        stopBeat();
         // Unbind from the service
         if (mBound) {
             Log.d("stop beat", "unbind the service connection " + mConnection);
             unbindService(mConnection);
             mBound = false;
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopBeat();
     }
 
     /**
@@ -335,6 +335,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
+            stopBeat();
             if (mInterstitialAd.isLoaded()) {
                 mInterstitialAd.show();
             }
@@ -430,6 +431,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateUI() {
+        beatView.setBeatLock(playerService);//sync with sound
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (isPlaying) {
                 fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause, this.getTheme()));
@@ -440,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             if (isPlaying) {
                 fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_pause));
-//                beatView.startBeat();
+                beatView.startBeat();
             } else {
                 fab.setImageDrawable(getResources().getDrawable(android.R.drawable.ic_media_play));
             }
@@ -453,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("start beat", "start");
 
             startService(svc);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
             //beatView.setBeatLock(playerService);//sync with sound
             playerService.startBeat();
             beatView.startBeat();
@@ -475,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             playerService.stopBeat();
             beatView.stopBeat();
             stopService(svc);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
     }
 
